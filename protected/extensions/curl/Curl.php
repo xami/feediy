@@ -206,7 +206,8 @@ class Curl extends CApplicationComponent{
 	*/
 	public function _setHeader($ch, $header) {
 		// We get the newline too so using trim().
-		if($header_trim = trim($header)) {
+		$header_trim = trim($header);
+		if($header_trim) {
 			// Saving no empty header
 			$this->_header[] = $header_trim;
 		}
