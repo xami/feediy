@@ -4,18 +4,18 @@
  * All controller classes for this application should extend from this base class.
  */
 
-function pr($data=array(), $stop=false, $start='<pre>', $end='</pre>')
+function pr($data=array(), $wrap=false, $stop=false, $start='<pre>', $end='</pre>')
 {
-	echo $start;
+	if($wrap) echo $start;
 	print_r($data);
-	echo $end;
+	if($wrap) echo $end;
 	if($stop) die;
 }
-function pd($data=array(), $stop=true, $start='<pre>', $end='</pre>')
+function pd($data=array(), $wrap=false, $stop=true, $start='<pre>', $end='</pre>')
 {
-	echo $start;
+	if($wrap) echo $start;
 	print_r($data);
-	echo $end;
+	if($wrap) echo $end;
 	if($stop) die;
 }
 

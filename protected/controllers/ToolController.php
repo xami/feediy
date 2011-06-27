@@ -124,7 +124,11 @@ class ToolController extends Controller
 		
 		$o = Tools::OZCurl($src, $expire, $show);
 	}
-	
+
+    public function actionXuk()
+	{
+		Xuk::getList();
+	}
 	
 
 	// Uncomment the following methods and override them if needed
