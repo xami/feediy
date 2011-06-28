@@ -158,7 +158,7 @@ class Curl extends CApplicationComponent{
 		
 		// Close handle first
 		$this->close();
-		
+
 		// Create new handle
 		$this->_curl = curl_init();
 		
@@ -255,7 +255,8 @@ class Curl extends CApplicationComponent{
 			
 		if(is_resource($this->_curl)) {
 			curl_close($this->_curl);
-			unset($this->_curl);
+            $this->_curl=null;
+//			unset($this->_curl);
 		}
 		return true;
 	}

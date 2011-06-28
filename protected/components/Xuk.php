@@ -1,7 +1,7 @@
 <?php
 class Xuk
 {
-    protected static $WPPATH='';
+    protected static $WPPATH='D:\xami\wordpress';
 //    protected $xuk_pass='';
     //get item links, insert db
 	public static function getList()
@@ -32,47 +32,53 @@ class Xuk
 
         $http_code=isset($http_code[1]) ? $http_code[1] : 'utf-8';
 //        echo "\r\n";
-        if(!isset($links[2]) || !empty($links[2])){
+        if(!isset($links[2]) || empty($links[2])){
             return false;
         }
-        if(!isset($links[3]) || !empty($links[3])){
+        
+        if(!isset($links[3]) || empty($links[3])){
             return false;
         }
 
-        if(!isset($names) || !empty($names)){
-            if(!isset($names[1]) || !empty($names[1])){
-                return false;
-            }
-            if(count($names[1])!=count($links[2]) || count($names[1])!=count($links[3])){
-                return false;
-            }
+        if(!isset($names) || empty($names)){
+            return false;
+        }
+
+        if(!isset($names[1]) || empty($names[1])){
+            return false;
+        }
+        
+        if(count($names[1])!=count($links[2]) || count($names[1])!=count($links[3])){
+            return false;
+        }
 
 
-            $i=0;
-            foreach($names[1] as $name){
+        $i=0;
+        $_gallery=new WpNggGallery;
+        foreach($names[1] as $name){
 
-                $gallery=new WpNggGallery;
-                $gallery->path='wp-content/gallery/xuk/'.trim($links[2][$i]).'/'.trim($links[3][$i]);
-                $gallery->slug=trim($links[2][$i]).'/'.trim($links[3][$i]);
-                $data=$gallery->search()->getData();
+            $gallery=clone $_gallery;
+            $gallery->path='wp-content/gallery/xuk/'.trim($links[2][$i]).'/'.trim($links[3][$i]);
+            $gallery->slug=trim($links[2][$i]).'/'.trim($links[3][$i]);
+            $data=$gallery->search()->getData();
 //                pd($data);
 
-                if(empty($data)){
-                    $name_utf8=iconv($http_code, 'utf-8', $name);
-                    $gallery->name=$name_utf8;
-                    $gallery->title=trim($links[3][$i]);
-                    $gallery->galdesc='';
-                    $gallery->pageid=0;
-                    $gallery->previewpic=1;
-                    $gallery->author=0;         //if updated gallery ,then set to 1
-                    $gallery->save();
+            if(empty($data)){
+                $name_utf8=iconv($http_code, 'utf-8', $name);
+                $gallery->name=$name_utf8;
+                $gallery->title=trim($links[3][$i]);
+                $gallery->galdesc='';
+                $gallery->pageid=0;
+                $gallery->previewpic=1;
+                $gallery->author=0;         //if updated gallery ,then set to 1
+                $gallery->save();
 //                    echo $i;
-                }
-                
-                $i++;
-//                echo "\r\n";
             }
+
+            $i++;
+//                echo "\r\n";
         }
+
 
         return true;
 	}
@@ -81,7 +87,7 @@ class Xuk
 	public static function getItem()
 	{
         $expire=isset($_REQUEST['expire']) ? intval($_REQUEST['expire']) : 30;
-        
+
 		$gallery=WpNggGallery::model()->find('author=0');
         if(empty($gallery->slug)){
             return false;
@@ -98,56 +104,60 @@ class Xuk
         }
 
         preg_match_all("'<a\s+class=\"xuk_gallery\"\s+href=\"(.*?)\">'isx", $html, $images);
-        if(!empty($images)){
-            $pictures=new WpNggPictures;
-            foreach($images[1] as $image){
+        if(empty($images)){
+            return false;
+        }
+        
+        $pictures=new WpNggPictures;
+        foreach($images[1] as $image){
 //                $key=MCrypy::encrypt($image, Yii::app()->params['xuk_pass'], 128);
-                $key=md5($image);
-                $suffix=substr($image,strrpos($image,'.'));
-                $suffix_len=strlen($suffix);
-                if($suffix_len<4 || $suffix_len>5 || (substr($suffix, 0, 1)!='.')){
-                    continue;
-                }
+            $key=md5($image);
+            $suffix=substr($image,strrpos($image,'.'));
+            $suffix_len=strlen($suffix);
+            if($suffix_len<4 || $suffix_len>5 || (substr($suffix, 0, 1)!='.')){
+                continue;
+            }
 
 
-                if(strpos($gallery->slug,'/')!==false){
-                    $alt=explode('/',$gallery->slug);
-                }else{
-                    $alt[0]='xxer';
-                    $alt[1]='girl';
-                }
+            if(strpos($gallery->slug,'/')!==false){
+                $alt=explode('/',$gallery->slug);
+            }else{
+                $alt[0]='xxer';
+                $alt[1]='girl';
+            }
 
 
-                $_pictures=clone $pictures;
-                $_pictures->image_slug=$key;
-                $_pictures->galleryid=$gallery->gid;
-                $data=$_pictures->search()->getData();
+            $_pictures=clone $pictures;
+            $_pictures->image_slug=$key;
+            $_pictures->galleryid=$gallery->gid;
+            $data=$_pictures->search()->getData();
 
-                if(empty($data)){
-                    $_pictures->post_id=0;
-                    $_pictures->filename=$key.$suffix;
-                    $_pictures->description=$gallery->name.','.$alt[0].','.$alt[1];
-                    $_pictures->alttext=$gallery->name.','.$alt[0].','.$alt[1];
-                    $_pictures->imagedate=date('Y-m-d H:i:s');
-                    $_pictures->exclude=0;
-                    $_pictures->sortorder=0;
-                    $_pictures->meta_data='';
-                    if($_pictures->save()){
-                        $src_obj=new WpNggSrc;
-                        $src_obj->pid=$_pictures->pid;
-                        $src_obj->gid=$gallery->gid;
-                        $src_obj->src=$image;
-                        $src_obj->name=$gallery->name;
-                        $src_obj->path=$gallery->path;
-                        $src_obj->filename=$_pictures->filename;
-                        $src_obj->status=0;
-                        $src_obj->mktime=date('Y-m-d H:i:s');
-                        $src_obj->save();
-                    }
+            if(empty($data)){
+                $_pictures->post_id=0;
+                $_pictures->filename=$key.$suffix;
+                $_pictures->description=$gallery->name.','.$alt[0].','.$alt[1];
+                $_pictures->alttext=$gallery->name.','.$alt[0].','.$alt[1];
+                $_pictures->imagedate=date('Y-m-d H:i:s');
+                $_pictures->exclude=0;
+                $_pictures->sortorder=0;
+                $_pictures->meta_data='';
+                if($_pictures->save()){
+                    $src_obj=new WpNggSrc;
+                    $src_obj->pid=$_pictures->pid;
+                    $src_obj->gid=$gallery->gid;
+                    $src_obj->src=$image;
+                    $src_obj->name=$gallery->name;
+                    $src_obj->path=$gallery->path;
+                    $src_obj->filename=$_pictures->filename;
+                    $src_obj->status=0;
+                    $src_obj->mktime=date('Y-m-d H:i:s');
+                    $src_obj->save();
                 }
             }
         }
 
+        $gallery->author=1;
+        $gallery->save();
         return true;
 	}
 
@@ -171,14 +181,18 @@ class Xuk
         }
 
         $save_path=self::$WPPATH.DIRECTORY_SEPARATOR.$src_obj->path;
-        
-        if(mkdir($save_path, 755, true)){
-            if(file_put_contents($save_path.DIRECTORY_SEPARATOR.$src_obj->filename,$html)){
-                $src_obj->status=1;
-                $src_obj->save();
-                return true;
+        if(!is_dir($save_path)){
+            if(!mkdir($save_path, 755, true)){
+                return false;
             }
         }
+
+        if(file_put_contents($save_path.DIRECTORY_SEPARATOR.$src_obj->filename,$html)){
+            $src_obj->status=1;
+            $src_obj->save();
+            return true;
+        }
+
 
         return false;
 	}
