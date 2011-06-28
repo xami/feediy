@@ -127,7 +127,17 @@ class ToolController extends Controller
 
     public function actionXuk()
 	{
-		Xuk::getList();
+		var_dump(Xuk::getList());
+        var_dump(Xuk::getItem());
+        var_dump(Xuk::getImage());
+	}
+
+    public function actionTest()
+	{
+        var_dump(substr('.afas', 0, 1)!='.') ;
+		echo MCrypy::decrypt('DP9gh8NxCU7dIuk0teVguS5fM5Pzv4ACdDswFgkH8yWUAC+GMqTRp+33XeLbSesX8JsKdV5ZJvdTvlm1V0zNjNP85/xS5UcYn6j4IxsB', Yii::app()->params['xuk_pass'], 128);
+        echo '<br>';
+        echo strlen('DP9gh8NxCU7dIuk0teVguS5fM5Pzv4ACdDswFgkH8yWUAC+GMqTRp+33XeLbSesX8JsKdV5ZJvdTvlm1V0zNjNP85/xS5UcYn6j4IxsB');
 	}
 	
 
