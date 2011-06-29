@@ -1,7 +1,7 @@
 <?php
 class Xuk
 {
-    protected static $WPPATH='D:\xami\wordpress';
+    protected static $WPPATH='/data/htdocs/www.xxer.info';
     protected static $WPDOMAIN='http://www.xxer.info';
 //    protected $xuk_pass='';
     //get item links, insert db
