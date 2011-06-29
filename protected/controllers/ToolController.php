@@ -127,9 +127,10 @@ class ToolController extends Controller
 
     public function actionXuk()
 	{
-		var_dump(Xuk::getList());
-        var_dump(Xuk::getItem());
-        var_dump(Xuk::getImage());
+		var_dump(Xuk::getList());       //get gallery list
+        var_dump(Xuk::getItem());       //get gallery
+        var_dump(Xuk::getImage());      //down image
+        var_dump(Xuk::postGallery());   //new post
 	}
 
     public function actionTest()

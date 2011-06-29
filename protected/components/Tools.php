@@ -10,7 +10,7 @@ class Tools
 //			return false;
 //		}
 		
-		$expire = intval($expire)>10 ? intval($expire) : 10;
+		$expire = intval($expire)>20 ? intval($expire) : 20;
 		$src = trim($src);
 		if(empty($src)) return false;
 		

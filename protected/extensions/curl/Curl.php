@@ -67,7 +67,7 @@ class Curl extends CApplicationComponent{
 		// Add headerfunction, so we can save raw headers
 		$this->setOption(CURLOPT_HEADERFUNCTION, array($this, '_setHeader'));
 		
-		$this->setOption(CURLOPT_TIMEOUT, 20);
+		$this->setOption(CURLOPT_TIMEOUT, 24);
 		
 		// Set user options
 		if(is_array($config) && count($config) > 0) {
