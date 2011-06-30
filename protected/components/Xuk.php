@@ -5,12 +5,12 @@ class Xuk
     protected static $WPDOMAIN='http://www.xxer.info';
 //    protected $xuk_pass='';
     //get item links, insert db
-	public static function getList()
+	public static function getList($id)
 	{
-		$id=isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 1;
+
         $id=($id<1) ? 1 : $id;
 
-        $expire=isset($_REQUEST['expire']) ? intval($_REQUEST['expire']) : 30;
+        $expire=isset($_REQUEST['expire']) ? intval($_REQUEST['expire']) : 3000;
         $src='http://xuk.ru/'.$id.'.html';
 
         $html='';
@@ -19,6 +19,7 @@ class Xuk
            (isset($page['Info']['http_code']) && $page['Info']['http_code']==200)){
             $html=$page['Result'];
         }else{
+            Yii::log('curl error::'.$src,$level='warning',$category='list');
             return false;
         }
 
@@ -34,22 +35,27 @@ class Xuk
         $http_code=isset($http_code[1]) ? $http_code[1] : 'utf-8';
 //        echo "\r\n";
         if(!isset($links[2]) || empty($links[2])){
+            Yii::log('empty $links[2]',$level='warning',$category='list');
             return false;
         }
         
         if(!isset($links[3]) || empty($links[3])){
+            Yii::log('empty $links[3]',$level='warning',$category='list');
             return false;
         }
 
         if(!isset($names) || empty($names)){
+            Yii::log('empty $names',$level='warning',$category='list');
             return false;
         }
 
         if(!isset($names[1]) || empty($names[1])){
+            Yii::log('empty $names[1]',$level='warning',$category='list');
             return false;
         }
         
         if(count($names[1])!=count($links[2]) || count($names[1])!=count($links[3])){
+            Yii::log('count($names[1])!=count($links[2]) || count($names[1])!=count($links[3]',$level='warning',$category='list');
             return false;
         }
 
@@ -72,8 +78,9 @@ class Xuk
                 $gallery->pageid=0;
                 $gallery->previewpic=1;
                 $gallery->author=0;         //if updated gallery ,then set to 1
-                $gallery->save();
-//                    echo $i;
+                if(!$gallery->save()){
+                    Yii::log('$gallery->save()::'.serialize($gallery->getData()),$level='warning',$category='list');
+                }
             }
 
             $i++;
@@ -87,10 +94,11 @@ class Xuk
     //get items,insert db
 	public static function getItem()
 	{
-        $expire=isset($_REQUEST['expire']) ? intval($_REQUEST['expire']) : 30;
+        $expire=isset($_REQUEST['expire']) ? intval($_REQUEST['expire']) : 300;
 
 		$gallery=WpNggGallery::model()->find('author=0');
         if(empty($gallery->slug)){
+            Yii::log('empty($gallery->slug)',$level='warning',$category='item');
             return false;
         }
         $src='http://xuk.ru/'.$gallery->slug.'/vid-1.html';
@@ -101,11 +109,13 @@ class Xuk
            (isset($page['Info']['http_code']) && $page['Info']['http_code']==200)){
             $html=$page['Result'];
         }else{
+            Yii::log('curl error::'.$src,$level='warning',$category='item');
             return false;
         }
 
         preg_match_all("'<a\s+class=\"xuk_gallery\"\s+href=\"(.*?)\">'isx", $html, $images);
         if(empty($images)){
+            Yii::log('empty($images)',$level='warning',$category='item');
             return false;
         }
         
@@ -116,6 +126,7 @@ class Xuk
             $suffix=substr($image,strrpos($image,'.'));
             $suffix_len=strlen($suffix);
             if($suffix_len<4 || $suffix_len>5 || (substr($suffix, 0, 1)!='.')){
+                Yii::log('suffix error::'.$image,$level='warning',$category='item');
                 continue;
             }
 
@@ -152,25 +163,32 @@ class Xuk
                     $src_obj->filename=$_pictures->filename;
                     $src_obj->status=0;
                     $src_obj->mktime=date('Y-m-d H:i:s');
-                    $src_obj->save();
+                    if(!$src_obj->save()){
+                        Yii::log('$src_obj->save()::'.serialize($src_obj->getData()),$level='warning',$category='item');
+                    }
 //                    $gallery->previewpic=$_pictures->pid;
 //                    $gallery->save();
+                }else{
+                    Yii::log('$_pictures->save()::'.serialize($_pictures->getData()),$level='warning',$category='item');
                 }
             }
         }
 
         $gallery->author=-1;
-        $gallery->save();
+        if(!$gallery->save()){
+            Yii::log('$gallery->save()::'.serialize($gallery->getData()),$level='warning',$category='item');
+        }
         return true;
 	}
 
-    //get images, make small images, insert db
+    //get images, make small images, insert dbs
 	public static function getImage()
 	{
 		$expire=isset($_REQUEST['expire']) ? intval($_REQUEST['expire']) : 30;
         $src_obj=WpNggSrc::model()->find('status=0');
 
         if(empty(self::$WPPATH) || !isset($src_obj->src) || empty($src_obj->src)){
+            Yii::log('empty(self::$WPPATH) || !isset($src_obj->src) || empty($src_obj->src)',$level='warning',$category='image');
             return false;
         }
 
@@ -180,18 +198,21 @@ class Xuk
            (isset($page['Info']['http_code']) && $page['Info']['http_code']==200)){
             $html=$page['Result'];
         }else{
+            Yii::log('Tools::OZCurl($src_obj->src, $expire)::'.$src_obj->src,$level='warning',$category='image');
             return false;
         }
 
         $save_path=self::$WPPATH.DIRECTORY_SEPARATOR.$src_obj->path;
         if(!is_dir($save_path)){
             if(!mkdir($save_path, 755, true)){
+                Yii::log('mkdir($save_path, 755, true)',$level='warning',$category='image');
                 return false;
             }
         }
         $thumbs_path=self::$WPPATH.DIRECTORY_SEPARATOR.$src_obj->path.DIRECTORY_SEPARATOR.'thumbs';
         if(!is_dir($thumbs_path)){
             if(!mkdir($thumbs_path, 755, true)){
+                Yii::log('mkdir($thumbs_path, 755, true)',$level='warning',$category='image');
                 return false;
             }
         }
@@ -205,7 +226,7 @@ class Xuk
             return true;
         }
 
-
+        Yii::log('file_put_contents($save_path.DIRECTORY_SEPARATOR.$src_obj->filename,$html)',$level='warning',$category='image');
         return false;
 	}
 
