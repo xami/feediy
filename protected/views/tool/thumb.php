@@ -7,21 +7,29 @@
  */
 
 $var="
-var op='".$op."';
-var id=parseInt(".$id.");
+var pid=parseInt(".$pid.");
+var dm='".$dm."';
 ";
 
 $run="
-function show_do(data){
-	if(data!=null && data.responseStatus!=null && data.responseStatus=='200'){
-        $('#links').append('<div class=\"right\">'+op+id+'&nbsp;right</div>');
-	}else{
-	    $('#links').append('<div class=\"error\">'+op+id+'&nbsp;error</div>');
-	}
-	id++;
+function redo(data){
+//	location.reload();
 }
 function apido(){
-	jQuery.ajax({'url':'/index.php?r=tool/xuk','success':show_do, 'complete':apido, 'type':'post', 'dataType':'json', 'data':{'op':op, 'id':id}, 'cache':false});
+	jQuery.ajax({
+	    'url':dm+'/wp-admin/admin-ajax.php',
+	    'complete':redo,
+	    'type':'post',
+	    'dataType':'json',
+	    'contentType':'application/x-www-form-urlencoded',
+	    'data':{
+	        '_wpnonce':'198eceae35',
+	        'action':'ngg_ajax_operation',
+	        'image':pid,
+	        'operation':'create_thumbnail'
+	    },
+	    'cache':false
+	});
 }
 ";
 

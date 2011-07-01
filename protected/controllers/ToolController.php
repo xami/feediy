@@ -127,6 +127,8 @@ class ToolController extends Controller
 
     public function actionXuk()
 	{
+        //ig: http://www.feediy.com/index.php?r=tool/xuk&op=image
+        
         $op=trim(strtolower(Yii::app()->request->getParam('op', 'list')));
         $id=intval(Yii::app()->request->getParam('id', 1));
         $id=($id<1) ? 1 : $id;
@@ -163,6 +165,15 @@ class ToolController extends Controller
         }
 	}
 
+    public function actionThumb()
+    {
+        //ig: http://www.feediy.com/index.php?r=tool/thumb
+        if(($info=Xuk::createThumbnail())!==false){
+            $this->layout='//layouts/click';
+            $this->render('ajaxcdr', $info);
+        }
+    }
+
     public function actionUp()
     {
         
@@ -173,7 +184,7 @@ class ToolController extends Controller
         var_dump(substr('.afas', 0, 1)!='.') ;
 		echo MCrypy::decrypt('DP9gh8NxCU7dIuk0teVguS5fM5Pzv4ACdDswFgkH8yWUAC+GMqTRp+33XeLbSesX8JsKdV5ZJvdTvlm1V0zNjNP85/xS5UcYn6j4IxsB', Yii::app()->params['xuk_pass'], 128);
         echo '<br>';
-        echo strlen('DP9gh8NxCU7dIuk0teVguS5fM5Pzv4ACdDswFgkH8yWUAC+GMqTRp+33XeLbSesX8JsKdV5ZJvdTvlm1V0zNjNP85/xS5UcYn6j4IxsB');
+        echo strlen('_wpnonce=198eceae35&action=ngg_ajax_operation&image=501&operation=create_thumbnail');
 	}
 	
 

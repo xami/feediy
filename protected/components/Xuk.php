@@ -234,6 +234,7 @@ class Xuk
     {
         $gallery=WpNggGallery::model()->find('author=-1');
         if(empty($gallery->slug) || empty($gallery->name)){
+            Yii::log('empty($gallery->slug) || empty($gallery->name)',$level='warning',$category='post');
             return false;
         }
         $date=date('Y-m-d H:i:s');
@@ -286,7 +287,9 @@ object_id 	term_taxonomy_id 	term_order
         $post->comment_count=0;
         if($post->save()){
             $post->guid=self::$WPDOMAIN.'/?p='.$post->ID;
-            $post->save();
+            if(!$post->save()){
+                Yii::log('$post->ID'.serialize($post->getData),$level='warning',$category='post');
+            }
 
             switch(strtolower($gallery->galdesc)){
                 case 'teen':
@@ -317,21 +320,36 @@ object_id 	term_taxonomy_id 	term_order
                 if($TR->save()){
                     $TT=WpTermTaxonomy::model()->findByPk($cid);
                     $TT->count++;
-                    $TT->save();
+                    if(!$TT->save()){
+                        Yii::log('$TT->save()::'.serialize($TT->getData),$level='warning',$category='post');
+                    }
+                }else{
+                    Yii::log('$TR->save()::'.serialize($TR->getData),$level='warning',$category='post');
                 }
             }
 
             $gallery->author=1;
-            $gallery->save();
+            if(!$gallery->save()){
+                Yii::log('$gallery->save()::'.serialize($gallery->getData),$level='warning',$category='post');
+            }
             return true;
         }
 
+        Yii::log('$post->save()::'.serialize($post->getData),$level='warning',$category='post');
         return false;
 
     }
 
-    public static function mkAlbum()
+    public static function createThumbnail()
     {
+        $pictures=WpNggPictures::model()->find('meta_data IS NULL or meta_data=\'\'');
+        $once=trim(strtolower(Yii::app()->request->getParam('once', '')));
         
+        if(!isset($pictures->pid) || empty($pictures->pid)){
+            Yii::log('empty($data)::',$level='warning',$category='thumbnail');
+            return false;
+        }
+
+        return array('pid'=>$pictures->pid, 'dm'=>self::$WPDOMAIN, 'once'=>$once);
     }
 }
