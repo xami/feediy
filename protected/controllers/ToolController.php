@@ -176,7 +176,7 @@ class ToolController extends Controller
 
     public function actionGetlinks()
     {
-        $expire = isset($_REQUEST['expire']) ? intval($_REQUEST['expire']) : 300;
+        $expire = isset($_REQUEST['expire']) ? intval($_REQUEST['expire']) : 3000;
 		$src = isset($_REQUEST['src']) ? trim($_REQUEST['src']) : '';
 
         $page=Tools::OZCurl($src, $expire);
@@ -200,6 +200,7 @@ class ToolController extends Controller
 
 
         preg_match_all("'<\s*a\s.*?href\s*=\s*([\"\']?)(?(1)(.*?)\\1|([^\s\>]+))[^>]*>?(.*?)</a>'isx",$html,$links);
+//        pd($links);
         if(empty($links)){
             echo json_encode(array('status'=>500,'data'=>''));
         }else{
@@ -207,7 +208,16 @@ class ToolController extends Controller
             $src_info=parse_url($src);
             $links_full=array();
             foreach($links[2] as $link){
+                $link=trim($link);
                 unset($link_info);
+                if(strpos($link, 'http://')>0){
+                    $links_full[]=$src_info['scheme'].'://'.$src_info['host'].'/'.$link;
+                    continue;
+                }
+//                if(strpos($link, 'mailto:')==0){
+//                    continue;
+//                }
+
                 $link_info=parse_url($link);
 
                 if(!isset($link_info['path'])){
@@ -216,11 +226,18 @@ class ToolController extends Controller
                 if(!isset($link_info['query'])){
                     $link_info['query']='';
                 }
+                if(!empty($link_info['query'])){
+                    $link_info['query']='?'.$link_info['query'];
+                }
 
-
+                if(strpos($link_info['path'], '/')!=0){
+                    $link_info['path']='/'.$link_info['path'];
+                }
+                
                 if(!isset($link_info['scheme']) || empty($link_info['scheme']) || !isset($link_info['host']) || empty($link_info['host'])){
                     $links_full[]=$src_info['scheme'].'://'.$src_info['host'].$link_info['path'].$link_info['query'];
                 }else{
+                    //不是当前域名下的链接跳过
                     if(($src_info['scheme']!=$link_info['scheme']) || ($src_info['host']!=$link_info['host'])){
                         continue;
                     }
@@ -230,7 +247,14 @@ class ToolController extends Controller
                 
             }
             $links_full=array_unique($links_full);
-            echo json_encode(array('status'=>200,'data'=>$links_full));
+            //过滤array_unique引起的空白索引
+            $ct_link=array();
+            if(!empty($links_full)){
+                foreach($links_full as $the_link){
+                    $ct_link[]=$the_link;
+                }
+            }
+            echo json_encode(array('status'=>200,'count'=>count($links_full),'data'=>$ct_link));
         }
 
     }
@@ -241,7 +265,7 @@ class ToolController extends Controller
 //		echo MCrypy::decrypt('DP9gh8NxCU7dIuk0teVguS5fM5Pzv4ACdDswFgkH8yWUAC+GMqTRp+33XeLbSesX8JsKdV5ZJvdTvlm1V0zNjNP85/xS5UcYn6j4IxsB', Yii::app()->params['xuk_pass'], 128);
 //        echo '<br>';
 //        echo strlen('_wpnonce=198eceae35&action=ngg_ajax_operation&image=501&operation=create_thumbnail');
-        pr(parse_url('http://username:password@hostname/path?arg=http://www.baidu.com#22'));
+        pr(parse_url('link.php?url=http://news.orzero.com'));
 	}
 	
 

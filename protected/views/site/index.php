@@ -6,7 +6,7 @@ $cs->registerCoreScript('jquery');
 <style type="text/css">
 #msg {
     background: none repeat scroll 0 0 #E6E6E6;
-    color: #666666;;
+    color: red;
     height: 20px;
     line-height: 20px;
     text-align: center;
@@ -68,37 +68,48 @@ $cs->registerCoreScript('jquery');
 
 (function($) {
     $.fn.siteMap = function(settings) {
-        var url_index = new Array(2);
-        var url_data = new Array(3);
-        var url_depth = 0;
-        var index = '';
+//        var url_index = new Array(2);
+//        var url_data = new Array(3);
+//        var url_depth = 0;
+//        var index = '';
         
         settings = jQuery.extend({
-            api_url: '/tool/getlinks'
+            api_url: '/tool/getlinks',
+            url_depth:0,
+            the_index: new String(),
+            url_index: new Array(2),
+            url_data: new Array(3)
         },settings || {});
         
         this.click(function (){
-            url_index[0] = new Array();
-            url_index[0].push($(this).prev().val());
+            if(settings.url_index[0]==undefined){
+                settings.url_index[0]=[];
+                settings.url_index[0].push($(this).prev().val());
+//                _trace(settings.url_index, 'alert');
+            }
             _run();
         });
 
         var _run = function(){
+//            _trace(url_index, 'alert');
             _get_url_list();
         }
 
         var _get_url_list = function (){
-            if(url_index[url_depth]==undefined){
-                url_depth++;
-                if(url_index[url_depth]==undefined){
+
+            if(settings.url_index[settings.url_depth]==undefined){
+                settings.url_depth++;
+                if(settings.url_index[settings.url_depth]==undefined){
                     return false;
                 }
-                index = url_index[url_depth].shift();
-                if(index==undefined){
+
+                settings.the_index = settings.url_index[settings.url_depth].shift();
+                if(settings.the_index==undefined){
                     return false;
                 }
             }else{
-                index = url_index[url_depth].shift();
+//                _trace(settings.url_index, 'alert');
+                settings.the_index = settings.url_index[settings.url_depth].shift();
             }
             
             jQuery.ajax({
@@ -106,37 +117,91 @@ $cs->registerCoreScript('jquery');
                 'success':_save_url_list,
 //                'complete':_get_index,
                 'dataType':'json',
-                'data':{'src':index},
+                'data':{'src':settings.the_index},
                 'cache':false
             });
 
         };
 
         var _save_url_list = function (list){
-            if(list==null || list.status==null || list.status!=200){
+            if(list==null || list.status==null || list.status!=200 || list.data==null){
                 return false;
             }
-            if(url_depth<2){
-                if(list!=null){
-                    for(i=0;i<list.length;i++){
-                        if(url_index[url_depth+1]==undefined){
-                            url_index[url_depth+1]=new Array();
-                        }
-                        url_index[url_depth+1].push(list[i]);
+            
+            if(settings.url_depth<2){
+                for(var i=0;i<list.count;i++){
+                    if(settings.url_index[settings.url_depth+1]==undefined){
+                        settings.url_index[settings.url_depth+1]=[];
                     }
+                    var tmp=list.data[i];
+//                    if(typeof tmp != "string"){
+//                        _trace(tmp, 'alert');
+//                    }
+                    settings.url_index[settings.url_depth+1].push(tmp);
+
                 }
+                _trace(settings.url_index, 'alert');
             }
-            if(list!=null){
-                if(url_depth==0){
-                    url_data[0]=new Array();
-                    url_data[0].push();
-                }
-                for(i=0;i<list.length;i++){
-                    url_data[url_depth+1].push(list[i]);
-                }
-            }
+            
             _run();
         };
+
+        var _trace = function (x, traceType) {
+            var type = typeof(x), message = '';
+
+            switch (type) {
+                case 'object':
+                    message = traceObj(x, traceType);
+                    break;
+                default:
+                    message = typeof(x) + ': ' + x + (traceType && traceType == 'alert' ? '\n' : '<br>');
+                    break;
+            }
+
+            if (traceType && traceType == 'alert') {
+                alert(message)
+            } else {
+                document.write(message)
+            }
+
+            function traceObj(x, traceType) {
+                // 初始化对象属性
+                if (traceObj.tabNum === undefined) {
+                    traceObj.tabNum = 0;
+                }
+
+                var notice = '';
+                if (traceType && traceType == 'alert') {
+                    var tab = '\t', br = '\n';
+                } else {
+                    var tab = '&nbsp;&nbsp;&nbsp;&nbsp;', br = '<br>';
+                }
+
+                notice += typeof(x) + br;
+                for (var t = 0; t <traceObj.tabNum; t++) {
+                    notice += tab;
+                }
+                notice += '(' + br;
+                for (var i in x) {
+                    for (var t = 0; t <= traceObj.tabNum; t++) {
+                        notice += tab;
+                    }
+                    if (typeof(x[i]) == 'object') {
+                        notice += '[' + i + '] => ';
+                        traceObj.tabNum++; // 增加缩进
+                        notice += traceObj(x[i], traceType);
+                        traceObj.tabNum--; // 减少缩进
+                    } else {
+                        notice += '[' + i + ']' + ' => ' + typeof(x[i]) + ': ' + x[i] + br;
+                    }
+                }
+                for (var t = 0; t <traceObj.tabNum; t++) {
+                    notice += tab;
+                }
+                notice += ')' + br;
+                return notice;
+            }
+        }
 
     }
 })(jQuery);
