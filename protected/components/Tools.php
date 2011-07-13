@@ -13,6 +13,8 @@ class Tools
 		$expire = intval($expire)>20 ? intval($expire) : 20;
 		$src = trim($src);
 		if(empty($src)) return false;
+
+        if(!self::is_url($src)) return false;
 		
 		$c = null;
 		$key = md5($src);
@@ -54,6 +56,15 @@ class Tools
 		return $c;
 	}
 	
-	
+	public static function is_url($url){
+		$validate=new CUrlValidator();
+		if(empty($url)){
+			return false;
+		}
+		if($validate->validateValue($url)===false){
+			return false;
+		}
+	    return true;
+	}
 	
 }

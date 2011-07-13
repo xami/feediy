@@ -167,24 +167,81 @@ class ToolController extends Controller
 
     public function actionThumb()
     {
-        //ig: http://www.feediy.com/index.php?r=tool/thumb
+        //ig: http://www.feediy.com/index.php?r=tool/thumb&once=
         if(($info=Xuk::createThumbnail())!==false){
             $this->layout='//layouts/click';
             $this->render('ajaxcdr', $info);
         }
     }
 
-    public function actionUp()
+    public function actionGetlinks()
     {
-        
+        $expire = isset($_REQUEST['expire']) ? intval($_REQUEST['expire']) : 300;
+		$src = isset($_REQUEST['src']) ? trim($_REQUEST['src']) : '';
+
+        $page=Tools::OZCurl($src, $expire);
+        if($page==false){
+            echo json_encode(array('status'=>500,'data'=>''));
+            die;
+        }
+        if((isset($page['ErrNo']) && $page['ErrNo']==0) &&
+           (isset($page['Info']['http_code']) && $page['Info']['http_code']==200)){
+            $html=$page['Result'];
+        }else{
+            echo json_encode(array('status'=>500,'data'=>''));
+            die;
+        }
+
+        if($page['Info']['content_type']!='text/html'){
+            echo json_encode(array('status'=>500,'data'=>''));
+            die;
+        }
+
+
+
+        preg_match_all("'<\s*a\s.*?href\s*=\s*([\"\']?)(?(1)(.*?)\\1|([^\s\>]+))[^>]*>?(.*?)</a>'isx",$html,$links);
+        if(empty($links)){
+            echo json_encode(array('status'=>500,'data'=>''));
+        }else{
+            unset($src_info);
+            $src_info=parse_url($src);
+            $links_full=array();
+            foreach($links[2] as $link){
+                unset($link_info);
+                $link_info=parse_url($link);
+
+                if(!isset($link_info['path'])){
+                    $link_info['path']='';
+                }
+                if(!isset($link_info['query'])){
+                    $link_info['query']='';
+                }
+
+
+                if(!isset($link_info['scheme']) || empty($link_info['scheme']) || !isset($link_info['host']) || empty($link_info['host'])){
+                    $links_full[]=$src_info['scheme'].'://'.$src_info['host'].$link_info['path'].$link_info['query'];
+                }else{
+                    if(($src_info['scheme']!=$link_info['scheme']) || ($src_info['host']!=$link_info['host'])){
+                        continue;
+                    }
+                    $links_full[]=$link_info['scheme'].'://'.$link_info['host'].$link_info['path'].$link_info['query'];
+                }
+
+                
+            }
+            $links_full=array_unique($links_full);
+            echo json_encode(array('status'=>200,'data'=>$links_full));
+        }
+
     }
 
     public function actionTest()
 	{
-        var_dump(substr('.afas', 0, 1)!='.') ;
-		echo MCrypy::decrypt('DP9gh8NxCU7dIuk0teVguS5fM5Pzv4ACdDswFgkH8yWUAC+GMqTRp+33XeLbSesX8JsKdV5ZJvdTvlm1V0zNjNP85/xS5UcYn6j4IxsB', Yii::app()->params['xuk_pass'], 128);
-        echo '<br>';
-        echo strlen('_wpnonce=198eceae35&action=ngg_ajax_operation&image=501&operation=create_thumbnail');
+//        var_dump(substr('.afas', 0, 1)!='.') ;
+//		echo MCrypy::decrypt('DP9gh8NxCU7dIuk0teVguS5fM5Pzv4ACdDswFgkH8yWUAC+GMqTRp+33XeLbSesX8JsKdV5ZJvdTvlm1V0zNjNP85/xS5UcYn6j4IxsB', Yii::app()->params['xuk_pass'], 128);
+//        echo '<br>';
+//        echo strlen('_wpnonce=198eceae35&action=ngg_ajax_operation&image=501&operation=create_thumbnail');
+        pr(parse_url('http://username:password@hostname/path?arg=http://www.baidu.com#22'));
 	}
 	
 

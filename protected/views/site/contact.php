@@ -1,11 +1,11 @@
 <?php
 $this->pageTitle=Yii::app()->name . ' - Contact Us';
 $this->breadcrumbs=array(
-	'Contact',
+	'联系',
 );
 ?>
 
-<h1>Contact Us</h1>
+<h1>问题反馈,改进建议</h1>
 
 <?php if(Yii::app()->user->hasFlash('contact')): ?>
 
@@ -15,9 +15,7 @@ $this->breadcrumbs=array(
 
 <?php else: ?>
 
-<p>
-If you have business inquiries or other questions, please fill out the following form to contact us. Thank you.
-</p>
+<p>有任何建议或者使用中遇到的问题欢迎大家反馈,我会尽可给出解答和改进</p>
 
 <div class="form">
 
@@ -31,7 +29,7 @@ If you have business inquiries or other questions, please fill out the following
 	*/
 )); ?>
 
-	<p class="note">Fields with <span class="required">*</span> are required.</p>
+	<p class="note"><span class="required">*</span> 必填.</p>
 
 	<?php echo $form->errorSummary($model); ?>
 
