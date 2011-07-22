@@ -200,12 +200,13 @@ class ToolController extends Controller
 
 
         preg_match_all("'<\s*a\s.*?href\s*=\s*([\"\']?)(?(1)(.*?)\\1|([^\s\>]+))[^>]*>?(.*?)</a>'isx",$html,$links);
-//        pd($links);
+//        pr($links);
         if(empty($links)){
             echo json_encode(array('status'=>500,'data'=>''));
         }else{
             unset($src_info);
             $src_info=parse_url($src);
+//            pr($src_info);
             $links_full=array();
             foreach($links[2] as $link){
                 $link=trim($link);
@@ -214,9 +215,9 @@ class ToolController extends Controller
                     $links_full[]=$src_info['scheme'].'://'.$src_info['host'].'/'.$link;
                     continue;
                 }
-//                if(strpos($link, 'mailto:')==0){
-//                    continue;
-//                }
+                if($link_info['scheme']=='mailto' || $link_info['scheme']=='javascript'){
+                    continue;
+                }
 
                 $link_info=parse_url($link);
 
@@ -229,11 +230,21 @@ class ToolController extends Controller
                 if(!empty($link_info['query'])){
                     $link_info['query']='?'.$link_info['query'];
                 }
-
-                if(strpos($link_info['path'], '/')!=0){
-                    $link_info['path']='/'.$link_info['path'];
+//                pr($link_info);
+                if(strpos($link_info['path'], '/')!==0){
+                    if(strpos($src_info['path'], '/')!==0){
+                        $src_info['path']='/'.$src_info['path'];
+                    }
+                    if(substr($src_info['path'], -1, 1)!=='/'){
+                        $src_info['path']=$src_info['path'].'/';
+                    }
+                    $link_info['path']=$src_info['path'].$link_info['path'];
                 }
-                
+
+//                if(strpos($link_info['path'],'api')!==false){
+//                    continue;
+//                }
+
                 if(!isset($link_info['scheme']) || empty($link_info['scheme']) || !isset($link_info['host']) || empty($link_info['host'])){
                     $links_full[]=$src_info['scheme'].'://'.$src_info['host'].$link_info['path'].$link_info['query'];
                 }else{
@@ -251,9 +262,10 @@ class ToolController extends Controller
             $ct_link=array();
             if(!empty($links_full)){
                 foreach($links_full as $the_link){
-                    $ct_link[]=$the_link;
+                    $ct_link[]=html_entity_decode($the_link);
                 }
             }
+//            pr($ct_link);
             echo json_encode(array('status'=>200,'count'=>count($links_full),'data'=>$ct_link));
         }
 
@@ -266,6 +278,10 @@ class ToolController extends Controller
 //        echo '<br>';
 //        echo strlen('_wpnonce=198eceae35&action=ngg_ajax_operation&image=501&operation=create_thumbnail');
         pr(parse_url('link.php?url=http://news.orzero.com'));
+        $mystring = 'abc';
+        $findme   = 'a';
+        echo $pos = strpos($mystring, $findme);
+
 	}
 	
 

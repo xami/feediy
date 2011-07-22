@@ -96,8 +96,9 @@ $cs->registerCoreScript('jquery');
         }
 
         var _get_url_list = function (){
-
-            if(settings.url_index[settings.url_depth]==undefined){
+//            _trace(settings.url_index[settings.url_depth][0]==null, 'alert');
+            settings.the_index = settings.url_index[settings.url_depth].shift();
+            if(settings.the_index==undefined){
                 settings.url_depth++;
                 if(settings.url_index[settings.url_depth]==undefined){
                     return false;
@@ -107,15 +108,13 @@ $cs->registerCoreScript('jquery');
                 if(settings.the_index==undefined){
                     return false;
                 }
-            }else{
-//                _trace(settings.url_index, 'alert');
-                settings.the_index = settings.url_index[settings.url_depth].shift();
+//                _trace(settings.url_depth, 'alert');
             }
-            
+//            _trace(settings.the_index, 'alert');
             jQuery.ajax({
                 'url':settings.api_url,
                 'success':_save_url_list,
-//                'complete':_get_index,
+//                'complete':_save_url_list,
                 'dataType':'json',
                 'data':{'src':settings.the_index},
                 'cache':false
@@ -140,7 +139,7 @@ $cs->registerCoreScript('jquery');
                     settings.url_index[settings.url_depth+1].push(tmp);
 
                 }
-                _trace(settings.url_index, 'alert');
+//                _trace(settings.url_index, 'alert');
             }
             
             _run();
