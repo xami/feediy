@@ -128,7 +128,7 @@ class ToolController extends Controller
     public function actionXuk()
 	{
         //ig: http://www.feediy.com/index.php?r=tool/xuk&op=image
-        
+
         $op=trim(strtolower(Yii::app()->request->getParam('op', 'list')));
         $id=intval(Yii::app()->request->getParam('id', 1));
         $id=($id<1) ? 1 : $id;
