@@ -5,6 +5,10 @@ class Xuk
     protected static $WPDOMAIN='http://www.xxer.info';
 //    protected $xuk_pass='';
     //get item links, insert db
+
+    /*
+     * $id传入页号，解析并取得相册列表页面的链接
+     */
 	public static function getList($id)
 	{
 
@@ -92,6 +96,9 @@ class Xuk
 	}
 	
     //get items,insert db
+    /*
+     * 取得具体的相册的图片链接
+     */
 	public static function getItem()
 	{
         $expire=isset($_REQUEST['expire']) ? intval($_REQUEST['expire']) : 300;
@@ -182,6 +189,9 @@ class Xuk
 	}
 
     //get images, make small images, insert dbs
+    /*
+     * 取得相册里面的图片文件,并保存
+     */
 	public static function getImage()
 	{
 		$expire=isset($_REQUEST['expire']) ? intval($_REQUEST['expire']) : 30;
@@ -230,6 +240,9 @@ class Xuk
         return false;
 	}
 
+    /*
+     * 发表帖子
+     */
     public static function postGallery()
     {
         $gallery=WpNggGallery::model()->find('author=-1');
@@ -293,21 +306,21 @@ object_id 	term_taxonomy_id 	term_order
 
             switch(strtolower($gallery->galdesc)){
                 case 'teen':
-                    $cid=122;break;
+                    $cid=3;break;
                 case 'celeb':
-                    $cid=123;break;
+                    $cid=4;break;
                 case 'pussy':
-                    $cid=124;break;
+                    $cid=5;break;
                 case 'bikini':
-                    $cid=125;break;
+                    $cid=6;break;
                 case 'asian':
-                    $cid=126;break;
+                    $cid=7;break;
                 case 'lesbian':
-                    $cid=127;break;
+                    $cid=8;break;
                 case 'tits':
-                    $cid=128;break;
+                    $cid=9;break;
                 case 'other':
-                    $cid=129;break;
+                    $cid=10;break;
                 default:
                     $cid=0;
             }
@@ -332,8 +345,16 @@ object_id 	term_taxonomy_id 	term_order
             if(!$gallery->save()){
                 Yii::log('$gallery->save()::'.serialize($gallery->getData),$level='warning',$category='post');
             }
+
+            $src=WpNggSrc::model()->find('gid=:gid AND status=0', array(':gid'=>$gallery->gid));
+            if(isset($src->id) && !empty($src->id)){
+                $post->post_status='private';
+                $post->save();
+            }
             return true;
         }
+
+        
 
         Yii::log('$post->save()::'.serialize($post->getData),$level='warning',$category='post');
         return false;
