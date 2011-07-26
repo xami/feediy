@@ -159,6 +159,12 @@ class ToolController extends Controller
                     echo json_encode(array('responseStatus'=>200));
                 }
             }
+            if($op=='publish'){
+                //new post
+                if(Xuk::publicPost()==true){
+                    echo json_encode(array('responseStatus'=>200));
+                }
+            }
         }else{
             $this->layout='//layouts/simple';
             $this->render('do', array('id'=>$id, 'op'=>$op));

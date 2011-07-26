@@ -373,4 +373,34 @@ object_id 	term_taxonomy_id 	term_order
 
         return array('pid'=>$pictures->pid, 'dm'=>self::$WPDOMAIN, 'once'=>$once);
     }
+
+    public static function publicPost()
+    {
+        $post=WpPosts::model()->find('post_status=:st', array(':st'=>'private'));
+
+        if(isset($post->id) && !empty($post->id)){
+            $gid=0;
+            if(!empty($post->post_content)){
+                $e_start=explode('[nggallery id=',$post->post_content);
+                if(isset($e_start[1]) && !empty($e_start[1])){
+                    $gid=substr($e_start[1], 0 , -1);
+                    if(intval($gid) != $gid){
+                        $gid=0;
+                    }
+                }
+            }
+            
+            if(!empty($gid)){
+                $src=WpNggSrc::model()->find('gid=:gid AND status=0', array(':gid'=>$gid));
+                if(!isset($src->id)){
+                    $post->post_status='publish';
+                    if($post->save()){
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 }

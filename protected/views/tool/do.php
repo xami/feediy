@@ -9,19 +9,35 @@
 $var="
 var op='".$op."';
 var id=parseInt(".$id.");
+var run=true;
 ";
 
 $run="
 function show_do(data){
-	if(data!=null && data.responseStatus!=null && data.responseStatus=='200'){
+
+    if(data==null || data.responseStatus==null){
+        $('#msg').html('<div class=\"error\">'+op+'&nbsp;'+id+'&nbsp;warning</div>');
+        run=false;
+    }
+
+	if(data.responseStatus=='200'){
         $('#msg').html('<div class=\"right\">'+op+id+'&nbsp;right</div>');
 	}else{
 	    $('#links').append('<div class=\"error\">'+op+id+'&nbsp;error</div>');
 	}
 	id++;
+
+	api_do();
 }
-function apido(){
-	jQuery.ajax({'url':'/index.php?r=tool/xuk','success':show_do, 'complete':apido, 'type':'post', 'dataType':'json', 'data':{'op':op, 'id':id}, 'cache':false});
+function api_do(data){
+    if(run==true){
+	    jQuery.ajax({'url':'/index.php?r=tool/xuk',
+	    'success':show_do,
+	    /*'complete':api_do,*/
+	    'type':'post',
+	    'dataType':'json',
+	    'data':{'op':op, 'id':id}, 'cache':false});
+	}
 }
 ";
 
@@ -33,7 +49,7 @@ $packer = new JavaScriptPacker($js, 'Normal', true, false);
 $packed = $packer->pack();
 
 $cs->registerScript('items', $packed, CClientScript::POS_END);
-$cs->registerScript('items', 'apido();', CClientScript::POS_READY);
+$cs->registerScript('items', 'api_do();', CClientScript::POS_READY);
 ?>
 
 <style>
@@ -60,7 +76,7 @@ $cs->registerScript('items', 'apido();', CClientScript::POS_READY);
 	display: inline-block;
 	width: 355px;
 }
-#links .right{
+#msg .right , #links .right{
 	line-height: 1.22em;
 	border-style: solid;
     border-width: 1px;
@@ -83,7 +99,7 @@ $cs->registerScript('items', 'apido();', CClientScript::POS_READY);
     margin: 2px 10px;
     padding: 1px 5px 2px;
 }
-#links .error{
+#msg .error , #links .error{
 	line-height: 1.22em;
 	border-style: solid;
     border-width: 1px;
