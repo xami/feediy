@@ -28,6 +28,6 @@ function mycallback(){
 $cs=Yii::app()->clientScript;
 //$cs->registerCoreScript('jquery');
 //$cs->registerScript('update_thumb', "AjaxCrossDomainRequest('".$dm."/wp-admin/admin-ajax.php', 'POST', 'update_thumb', 'mycallback()');", CClientScript::POS_READY);
-$cs->registerScriptFile("/js/ajaxcdr/ajaxcdr.js", CClientScript::POS_END);
+$cs->registerScriptFile("./js/ajaxcdr/ajaxcdr.js", CClientScript::POS_END);
 //$cs->registerScript('update_thumb', '$("#to_run").get(0).click();', CClientScript::POS_READY);
 ?>

@@ -14,7 +14,7 @@ var id=parseInt(".$id.");
 $run="
 function show_do(data){
 	if(data!=null && data.responseStatus!=null && data.responseStatus=='200'){
-        $('#links').append('<div class=\"right\">'+op+id+'&nbsp;right</div>');
+        $('#msg').html('<div class=\"right\">'+op+id+'&nbsp;right</div>');
 	}else{
 	    $('#links').append('<div class=\"error\">'+op+id+'&nbsp;error</div>');
 	}
@@ -100,4 +100,7 @@ $cs->registerScript('items', 'apido();', CClientScript::POS_READY);
 }
 </style>
 
-<div id="links"></div>
+<div id="links">
+</div>
+<div id="msg">
+</div>
