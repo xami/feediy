@@ -131,7 +131,7 @@ class ToolController extends Controller
 
         $op=trim(strtolower(Yii::app()->request->getParam('op', 'list')));
         $id=intval(Yii::app()->request->getParam('id', 1));
-        $id=($id<1) ? 1 : $id;
+        $id=($id<1 || $id>1000) ? 1 : $id;
 
         if (Yii::app()->request->isAjaxRequest) {
             if($op=='list'){
@@ -139,30 +139,40 @@ class ToolController extends Controller
 //                $id=isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 1;
                 if(Xuk::getList($id)==true){
                     echo json_encode(array('responseStatus'=>200));
+                }else{
+                    echo json_encode(array('responseStatus'=>500));
                 }
             }
             if($op=='item'){
                 //get gallery
                 if(Xuk::getItem()==true){
                     echo json_encode(array('responseStatus'=>200));
+                }else{
+                    echo json_encode(array('responseStatus'=>500));
                 }
             }
             if($op=='image'){
                 //down image
                 if(Xuk::getImage()==true){
                     echo json_encode(array('responseStatus'=>200));
+                }else{
+                    echo json_encode(array('responseStatus'=>500));
                 }
             }
             if($op=='post'){
                 //new post
                 if(Xuk::postGallery()==true){
                     echo json_encode(array('responseStatus'=>200));
+                }else{
+                    echo json_encode(array('responseStatus'=>500));
                 }
             }
             if($op=='publish'){
                 //new post
                 if(Xuk::publicPost()==true){
                     echo json_encode(array('responseStatus'=>200));
+                }else{
+                    echo json_encode(array('responseStatus'=>500));
                 }
             }
         }else{
