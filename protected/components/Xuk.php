@@ -1,8 +1,8 @@
 <?php
 class Xuk
 {
-    protected static $WPPATH='/data/htdocs/www.xxer.info';
-    protected static $WPDOMAIN='http://www.xxer.info';
+    protected static $WPPATH='/data/htdocs/haoselang';
+    protected static $WPDOMAIN='http://www.haoselang.com';
 //    protected $xuk_pass='';
     //get item links, insert db
 
