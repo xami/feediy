@@ -23,6 +23,7 @@ function show_do(data){
 	if(data.responseStatus=='200'){
         $('#msg').html('<div class=\"right\">'+op+id+'&nbsp;right</div>');
 	}else{
+		run=false;
 	    $('#links').append('<div class=\"error\">'+op+id+'&nbsp;error</div>');
 	}
 	id++;

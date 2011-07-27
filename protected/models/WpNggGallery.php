@@ -32,6 +32,16 @@ class WpNggGallery extends CActiveRecord
 	{
 		return 'wp_ngg_gallery';
 	}
+	
+	public function scopes()
+    {
+        return array(
+            'recently_one'=>array(
+                'order'=>'gid ASC',
+                'limit'=>1,
+            ),
+        );
+    }
 
 	/**
 	 * @return array validation rules for model attributes.

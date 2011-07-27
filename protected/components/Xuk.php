@@ -245,7 +245,7 @@ class Xuk
      */
     public static function postGallery()
     {
-        $gallery=WpNggGallery::model()->find('author=-1');
+        $gallery=WpNggGallery::model()->recently_one()->find('author=-1');
         if(empty($gallery->slug) || empty($gallery->name)){
             Yii::log('empty($gallery->slug) || empty($gallery->name)',$level='warning',$category='post');
             return false;
