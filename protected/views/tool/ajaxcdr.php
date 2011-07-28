@@ -20,7 +20,8 @@ function mycallback(){
     if(AjaxCrossDomainResponse==1){
         location.reload();
     }else{
-        alert('error');
+        setTimeout("location.reload();",20000);
+        //alert('error');
     }
 }
 </script>
