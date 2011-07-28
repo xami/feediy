@@ -195,7 +195,11 @@ class Xuk
 	public static function getImage()
 	{
 		$expire=isset($_REQUEST['expire']) ? intval($_REQUEST['expire']) : 30;
-        $src_obj=WpNggSrc::model()->find('status=0');
+        
+		$src_obj=WpNggSrc::model()->with('gallery')->find('t.status=0 AND gallery.author=1');		
+		if(!isset($src_obj->src) || empty($src_obj->src)){
+            $src_obj=WpNggSrc::model()->find('status=0');
+        }
 
         if(empty(self::$WPPATH) || !isset($src_obj->src) || empty($src_obj->src)){
             Yii::log('empty(self::$WPPATH) || !isset($src_obj->src) || empty($src_obj->src)',$level='warning',$category='image');
