@@ -51,6 +51,16 @@ class WpNggSrc extends CActiveRecord
 			array('id, pid, gid, src, name, path, filename, status, mktime, uptime', 'safe', 'on'=>'search'),
 		);
 	}
+	
+	public function scopes()
+    {
+        return array(
+            'recently_one'=>array(
+                'order'=>'id ASC',
+                'limit'=>1,
+            ),
+        );
+    }
 
 	/**
 	 * @return array relational rules.
