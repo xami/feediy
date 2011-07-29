@@ -299,6 +299,12 @@ class ToolController extends Controller
         echo $pos = strpos($mystring, $findme);
 
 	}
+
+    //update gallery,images,posts
+    public function actionGIP(){
+        $id = intval(Yii::app()->request->getParam('id', '1'));
+        
+    }
 	
 
 	// Uncomment the following methods and override them if needed

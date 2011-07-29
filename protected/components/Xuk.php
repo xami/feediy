@@ -380,6 +380,58 @@ object_id 	term_taxonomy_id 	term_order
         return array('pid'=>$pictures->pid, 'dm'=>self::$WPDOMAIN, 'once'=>$once);
     }
 
+    public static function checkImage()
+    {
+        $id = intval(Yii::app()->request->getParam('id', '1'));
+        $id = ($id<1) ? 1 : $id;
+        $src=WpNggSrc::model()->findByPk($id);
+
+        if(isset($src)&&!empty($src->path)&&!empty($src->filename)){
+            if($src->status==1){
+                if(!is_file(self::$WPPATH.DIRECTORY_SEPARATOR.$src->path.DIRECTORY_SEPARATOR.$src->filename)){
+                    $src->status=0;
+                    if(!$src->save()){
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return ++$id;
+    }
+
+    public static function unpublishPost()
+    {
+        $id = intval(Yii::app()->request->getParam('id', '1'));
+        $id = ($id<1) ? 1 : $id;
+        $post=WpPosts::model()->findByPk($id);
+        
+        $gid=0;
+        if(isset($post)&&!empty($post->post_content)){
+            $e_start=explode('[nggallery id=',$post->post_content);
+            if(isset($e_start[1]) && !empty($e_start[1])){
+                $gid=substr($e_start[1], 0 , -1);
+                if(intval($gid) != $gid){
+                    $gid=0;
+                }else{
+                    $gid=intval($gid);
+                }
+            }
+        }
+
+        if($gid>0){
+            $src=WpNggSrc::model()->find('gid=:gid AND status=0', array(':gid'=>$gid));
+            if(isset($src)&&$src->id){
+                $post->post_status='private';
+                if($post->save()){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public static function publishPost()
     {
         $post=WpPosts::model()->find('post_status=:st', array(':st'=>'private'));
