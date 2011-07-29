@@ -380,11 +380,11 @@ object_id 	term_taxonomy_id 	term_order
         return array('pid'=>$pictures->pid, 'dm'=>self::$WPDOMAIN, 'once'=>$once);
     }
 
-    public static function publicPost()
+    public static function publishPost()
     {
         $post=WpPosts::model()->find('post_status=:st', array(':st'=>'private'));
 
-        if(isset($post->id) && !empty($post->id)){
+        if(isset($post->ID) && !empty($post->ID)){
             $gid=0;
             if(!empty($post->post_content)){
                 $e_start=explode('[nggallery id=',$post->post_content);
@@ -392,6 +392,8 @@ object_id 	term_taxonomy_id 	term_order
                     $gid=substr($e_start[1], 0 , -1);
                     if(intval($gid) != $gid){
                         $gid=0;
+                    }else{
+                        $gid=intval($gid);
                     }
                 }
             }

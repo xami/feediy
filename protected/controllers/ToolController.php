@@ -169,7 +169,7 @@ class ToolController extends Controller
             }
             if($op=='publish'){
                 //new post
-                if(Xuk::publicPost()==true){
+                if(Xuk::publishPost()==true){
                     echo json_encode(array('responseStatus'=>200));
                 }else{
                     echo json_encode(array('responseStatus'=>500));
